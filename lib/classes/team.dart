@@ -28,7 +28,7 @@ class Team {
   }
 }
 
-Future<void> addTeamDialog(BuildContext context, Function(String) onTeamAdded) async {
+Future<void> addTeamDialog(BuildContext context, Function(String) onAdded) async {
 
     String teamName = 'My Team';
 
@@ -50,13 +50,13 @@ Future<void> addTeamDialog(BuildContext context, Function(String) onTeamAdded) a
             TextButton(
               child: const Text('Cancel'),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
             ),
             ElevatedButton(
               child: const  Text('Add Team'),
               onPressed: () {
-                onTeamAdded(teamName.isEmpty ? 'My Team' : teamName);
+                onAdded(teamName.isEmpty ? 'My Team' : teamName);
                 Navigator.of(context).pop();
               },
             ),
@@ -65,3 +65,34 @@ Future<void> addTeamDialog(BuildContext context, Function(String) onTeamAdded) a
       },
     );
   }
+
+  Future<void> deleteTeamDialog(BuildContext context, Function onDelete) async {
+
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Delete Team?'),
+        content: const Text('Are you sure you want to delete this team? This action cannot be undone.'),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          ElevatedButton(
+            child: const Text('Delete'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            onPressed: () {
+              onDelete(); // Call the delete action function
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
