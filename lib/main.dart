@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:ball_dont_lie/home.dart';
+
+import 'loading.dart';
+import 'home.dart';
+import 'court.dart';
 
 void main() {
   runApp(MaterialApp(
-    initialRoute: "/",
+    initialRoute: '/',
     routes: {
-      "/": (context) => Home()
-    }
+      '/'     : (context) => Loading(),
+      '/home' : (context) => Home(),
+      '/court': (context) => Court(),
+    },
   ));
 }
-
