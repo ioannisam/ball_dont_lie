@@ -35,6 +35,23 @@ class _HomeState extends State<Home> {
     addTeamDialog(context, _addTeam);
   }
 
+  void _editTeam(String oldTeamName, String newTeamName) {
+    setState(() {
+      for (var team in teams) {
+        if (team.name == oldTeamName) {
+          team.name = newTeamName;
+          break;
+        }
+      }
+    });
+  }
+
+  void _showEditTeamDialog(String oldTeamName) {
+    editTeamDialog(context, oldTeamName, (newTeamName) {
+      _editTeam(oldTeamName, newTeamName);
+    });
+  }
+
   void _deleteTeam(String teamName) {
     setState(() {
       teams.removeWhere((team) => team.name == teamName);
@@ -75,6 +92,32 @@ class _HomeState extends State<Home> {
               },
             ),
         ],
+      ),
+      drawer: Drawer( // Add Drawer here
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.orange,
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
+              onTap: () {
+                Navigator.pushNamed(context, '/home/settings'); // Navigate to the settings page
+              },
+            ),
+          ],
+        ),
       ),
       body: teams.isEmpty
           ? const Center(child: Text('No teams added yet!'))
@@ -178,6 +221,8 @@ class _HomeState extends State<Home> {
                                     setState(() {
                                       isMoveMode = true;
                                     });
+                                  } else if (value == 'edit') {
+                                    _showEditTeamDialog(teams[index].name);
                                   }
                                 },
                                 itemBuilder: (context) => [
@@ -186,6 +231,13 @@ class _HomeState extends State<Home> {
                                     child: ListTile(
                                       leading: Icon(Icons.open_with),
                                       title: Text('Move Team'),
+                                    ),
+                                  ),
+                                  const PopupMenuItem(
+                                    value: 'edit',
+                                    child: ListTile(
+                                      leading: Icon(Icons.edit),
+                                      title: Text('Edit Team'),
                                     ),
                                   ),
                                   const PopupMenuItem(
@@ -200,7 +252,7 @@ class _HomeState extends State<Home> {
                               onTap: () {
                                 Navigator.pushNamed(
                                   context,
-                                  '/court',
+                                  '/home/court',
                                   arguments: teams[index],
                                 );
                               },

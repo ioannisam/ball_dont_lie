@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
 
 class Loading extends StatefulWidget {
 
@@ -13,10 +12,10 @@ class _LoadingState extends State<Loading> {
   void initState() {
     super.initState();
 
-    Future.delayed(Duration(seconds: 2), () {
-      Navigator.pushReplacement(
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.pushReplacementNamed(
         context,
-        MaterialPageRoute(builder: (context) => Home()),
+        '/home',
       );
     });
   }
@@ -25,11 +24,11 @@ class _LoadingState extends State<Loading> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Loading...'),
+        title: const Text('Loading...'),
         centerTitle: true,
         backgroundColor: Colors.orange,
       ),
-      body: Center(
+      body: const Center(
         child: CircularProgressIndicator(),
       ),
     );

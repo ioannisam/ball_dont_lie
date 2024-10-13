@@ -30,43 +30,81 @@ class Team {
 
 Future<void> addTeamDialog(BuildContext context, Function(String) onAdded) async {
 
-    String teamName = 'My Team';
+  String teamName = 'My Team';
 
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Add a Team'),
-          content: TextField(
-            onChanged: (value) {
-              teamName = value;
-            },
-            controller: TextEditingController()..text = 'My Team',
-            decoration: const InputDecoration(
-              labelText: 'Team Name',
-            ),
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Add a Team'),
+        content: TextField(
+          onChanged: (value) {
+            teamName = value;
+          },
+          controller: TextEditingController()..text = 'My Team',
+          decoration: const InputDecoration(
+            labelText: 'Team Name',
           ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButton(
-              child: const  Text('Add Team'),
-              onPressed: () {
-                onAdded(teamName.isEmpty ? 'My Team' : teamName);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          ElevatedButton(
+            child: const  Text('Add Team'),
+            onPressed: () {
+              onAdded(teamName.isEmpty ? 'My Team' : teamName);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
 
-  Future<void> deleteTeamDialog(BuildContext context, Function onDelete) async {
+Future<void> editTeamDialog(BuildContext context, String currentTeamName, Function(String) onEdited) async {
+
+  String teamName = currentTeamName;
+
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Edit Team'),
+        content: TextField(
+          onChanged: (value) {
+            teamName = value;
+          },
+          controller: TextEditingController()..text = currentTeamName,
+          decoration: const InputDecoration(
+            labelText: 'Team Name',
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          ElevatedButton(
+            child: const Text('Save'),
+            onPressed: () {
+              onEdited(teamName.isEmpty ? currentTeamName : teamName);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Future<void> deleteTeamDialog(BuildContext context, Function onDelete) async {
 
   return showDialog(
     context: context,
