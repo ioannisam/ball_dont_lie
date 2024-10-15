@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'classes/team.dart';
+import 'team.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -34,11 +34,12 @@ class _HomeState extends State<Home> {
     addTeamDialog(context, _addTeam);
   }
 
-  void _editTeam(String oldTeamName, String newTeamName) {
+  void _editTeam(String oldTeamName, String newTeamName, String newLogoPath) {
     setState(() {
       for (var team in teams) {
         if (team.name == oldTeamName) {
           team.name = newTeamName;
+          team.logo = newLogoPath;
           break;
         }
       }
@@ -46,8 +47,8 @@ class _HomeState extends State<Home> {
   }
 
   void _showEditTeamDialog(String oldTeamName) {
-    editTeamDialog(context, oldTeamName, (newTeamName) {
-      _editTeam(oldTeamName, newTeamName);
+    editTeamDialog(context, oldTeamName, (newTeamName, newLogoPath) {
+      _editTeam(oldTeamName, newTeamName, newLogoPath);
     });
   }
 
@@ -112,7 +113,7 @@ class _HomeState extends State<Home> {
               leading: const Icon(Icons.settings),
               title: const Text('Settings'),
               onTap: () {
-                Navigator.pushNamed(context, '/home/settings'); // Navigate to the settings page
+                Navigator.pushNamed(context, '/home/settings');
               },
             ),
           ],

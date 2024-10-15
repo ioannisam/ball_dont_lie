@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'classes/team.dart';
-import 'classes/player.dart';
-import 'dart:io'; // Importing for File usage
+import 'team.dart';
+import 'player.dart';
+import 'dart:io';
 
 class Court extends StatefulWidget {
   const Court({super.key});
@@ -194,7 +194,7 @@ class _CourtState extends State<Court> {
                               fit: BoxFit.cover,
                             )
                           : const DecorationImage(
-                              image: AssetImage('assets/placeholder_team_image.png'),
+                              image: AssetImage('assets/placeholder.jpg'),
                               fit: BoxFit.cover,
                             ),
                     ),
