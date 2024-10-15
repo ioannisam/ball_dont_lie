@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'classes/team.dart';
-import 'classes/player.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -180,11 +179,13 @@ class _HomeState extends State<Home> {
                                 ],
                               ),
                               onTap: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/court',
-                                  arguments: teams[index],
-                                );
+                                if(!isMoveMode) {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/court',
+                                    arguments: teams[index],
+                                  );
+                                }
                               },
                             ),
                           ),
@@ -250,11 +251,13 @@ class _HomeState extends State<Home> {
                                 ],
                               ),
                               onTap: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/home/court',
-                                  arguments: teams[index],
-                                );
+                                if(!isMoveMode) {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/home/court',
+                                    arguments: teams[index],
+                                  );
+                                }
                               },
                             ),
                           ),
