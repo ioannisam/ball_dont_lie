@@ -9,29 +9,21 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   List<Team> teams = [];
   bool isMoveMode = false;
 
-  void _addTeam(String teamName) {
-    bool teamExists = teams.any((team) => team.name.toLowerCase() == teamName.toLowerCase());
 
-    if (teamExists) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('A team with this name already exists!'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } else {
-      setState(() {
-        teams.add(Team(name: teamName, image: 'assets/ball2.png', logo: 'assets/ball.png'));
-      });
-    }
+  void _addTeam(String teamName, String teamLogo) { 
+    setState(() {
+      teams.add(Team(name: teamName, logo: teamLogo));
+    });
+  
   }
 
   void _showAddTeamDialog() {
-    addTeamDialog(context, _addTeam);
+    addTeamDialog(context, (teamName, teamLogo) {
+      _addTeam(teamName, teamLogo);
+    }, teams);
   }
 
   void _editTeam(String oldTeamName, String newTeamName, String newLogoPath) {
@@ -44,12 +36,13 @@ class _HomeState extends State<Home> {
         }
       }
     });
+    
   }
 
   void _showEditTeamDialog(String oldTeamName) {
     editTeamDialog(context, oldTeamName, (newTeamName, newLogoPath) {
       _editTeam(oldTeamName, newTeamName, newLogoPath);
-    });
+    }, teams);
   }
 
   void _deleteTeam(String teamName) {
@@ -82,7 +75,7 @@ class _HomeState extends State<Home> {
         centerTitle: true,
         backgroundColor: Colors.orange,
         actions: [
-          if (isMoveMode) 
+          if (isMoveMode)
             IconButton(
               icon: const Icon(Icons.done),
               onPressed: () {
@@ -92,32 +85,6 @@ class _HomeState extends State<Home> {
               },
             ),
         ],
-      ),
-      drawer: Drawer( // Add Drawer here
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.orange,
-              ),
-              child: Text(
-                'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
-              onTap: () {
-                Navigator.pushNamed(context, '/home/settings');
-              },
-            ),
-          ],
-        ),
       ),
       body: teams.isEmpty
           ? const Center(child: Text('No teams added yet!'))
@@ -158,8 +125,10 @@ class _HomeState extends State<Home> {
                                     _showDeleteTeamDialog(teams[index].name);
                                   } else if (value == 'move') {
                                     setState(() {
-                                      isMoveMode = true; 
+                                      isMoveMode = true;
                                     });
+                                  } else if (value == 'edit') {
+                                    _showEditTeamDialog(teams[index].name);
                                   }
                                 },
                                 itemBuilder: (context) => [
@@ -168,6 +137,13 @@ class _HomeState extends State<Home> {
                                     child: ListTile(
                                       leading: Icon(Icons.open_with),
                                       title: Text('Move Team'),
+                                    ),
+                                  ),
+                                  const PopupMenuItem(
+                                    value: 'edit',
+                                    child: ListTile(
+                                      leading: Icon(Icons.edit),
+                                      title: Text('Edit Team'),
                                     ),
                                   ),
                                   const PopupMenuItem(
@@ -180,13 +156,16 @@ class _HomeState extends State<Home> {
                                 ],
                               ),
                               onTap: () {
-                                if(!isMoveMode) {
+                                if (!isMoveMode) {
                                   Navigator.pushNamed(
                                     context,
-                                    '/court',
+                                    '/home/court',
                                     arguments: teams[index],
                                   );
                                 }
+                                setState(() {
+                                  isMoveMode = false;
+                                });
                               },
                             ),
                           ),
@@ -252,7 +231,7 @@ class _HomeState extends State<Home> {
                                 ],
                               ),
                               onTap: () {
-                                if(!isMoveMode) {
+                                if (!isMoveMode) {
                                   Navigator.pushNamed(
                                     context,
                                     '/home/court',
