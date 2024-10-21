@@ -90,166 +90,201 @@ class _HomeState extends State<Home> {
             ),
         ],
       ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.orange,
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            Card(
+              child: ListTile(
+                leading: Icon(Icons.settings),
+                title: Text('Settings'),
+                onTap: () {
+                  setState(() {
+                    isMoveMode = false;
+                  });
+                  Navigator.pushNamed(context, '/home/settings');
+                },
+              ),
+            ),
+            Card(
+              child: ListTile(
+                leading: Icon(Icons.info),
+                title: Text('Info'),
+                onTap: () {
+                  setState(() {
+                    isMoveMode = false;
+                  });
+                  Navigator.pushNamed(context, '/home/info');
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
       body: teams.isEmpty
           ? const Center(child: Text('No teams added yet!'))
-          : GestureDetector(
-              onTap: () {
-                setState(() {
-                  isMoveMode = false;
-                });
-              },
-              child: isMoveMode
-                  ? ReorderableListView.builder(
-                      itemCount: teams.length,
-                      onReorder: _reorderTeam,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          key: ValueKey(teams[index]),
-                          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                            ),
-                            elevation: 5,
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.all(15),
-                              leading: Image.asset(
-                                teams[index].logo,
-                                width: 50,
-                                height: 50,
-                              ),
-                              title: Text(
-                                teams[index].name,
-                                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                              ),
-                              trailing: PopupMenuButton(
-                                icon: const Icon(Icons.more_vert),
-                                onSelected: (value) {
-                                  if (value == 'delete') {
-                                    _showDeleteTeamDialog(teams[index].name);
-                                  } else if (value == 'move') {
-                                    setState(() {
-                                      isMoveMode = true;
-                                    });
-                                  } else if (value == 'edit') {
-                                    _showEditTeamDialog(teams[index].name, teams[index]);
-                                  }
-                                },
-                                itemBuilder: (context) => [
-                                  const PopupMenuItem(
-                                    value: 'move',
-                                    child: ListTile(
-                                      leading: Icon(Icons.open_with),
-                                      title: Text('Move Team'),
-                                    ),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: 'edit',
-                                    child: ListTile(
-                                      leading: Icon(Icons.edit),
-                                      title: Text('Edit Team'),
-                                    ),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: 'delete',
-                                    child: ListTile(
-                                      leading: Icon(Icons.delete),
-                                      title: Text('Delete Team'),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              onTap: () {
-                                if (!isMoveMode) {
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/home/court',
-                                    arguments: teams[index],
-                                  );
-                                }
-                                // This line can be removed if the user just wants to exit move mode on tap.
+          : isMoveMode
+              ? ReorderableListView.builder(
+                  itemCount: teams.length,
+                  onReorder: _reorderTeam,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      key: ValueKey(teams[index]),
+                      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        elevation: 5,
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.all(15),
+                          leading: Image.asset(
+                            teams[index].logo,
+                            width: 50,
+                            height: 50,
+                          ),
+                          title: Text(
+                            teams[index].name,
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
+                          trailing: PopupMenuButton(
+                            icon: const Icon(Icons.more_vert),
+                            onSelected: (value) {
+                              if (value == 'delete') {
+                                _showDeleteTeamDialog(teams[index].name);
+                              } else if (value == 'move') {
                                 setState(() {
-                                  isMoveMode = false;
+                                  isMoveMode = true;
                                 });
-                              },
-                            ),
+                              } else if (value == 'edit') {
+                                _showEditTeamDialog(teams[index].name, teams[index]);
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                value: 'move',
+                                child: ListTile(
+                                  leading: Icon(Icons.open_with),
+                                  title: Text('Move Team'),
+                                ),
+                              ),
+                              const PopupMenuItem(
+                                value: 'edit',
+                                child: ListTile(
+                                  leading: Icon(Icons.edit),
+                                  title: Text('Edit Team'),
+                                ),
+                              ),
+                              const PopupMenuItem(
+                                value: 'delete',
+                                child: ListTile(
+                                  leading: Icon(Icons.delete),
+                                  title: Text('Delete Team'),
+                                ),
+                              ),
+                            ],
                           ),
-                        );
-                      },
-                    )
-                  : ListView.builder(
-                      itemCount: teams.length,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                            ),
-                            elevation: 5,
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.all(15),
-                              leading: Image.asset(
-                                teams[index].logo,
-                                width: 50,
-                                height: 50,
-                              ),
-                              title: Text(
-                                teams[index].name,
-                                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                              ),
-                              trailing: PopupMenuButton(
-                                icon: const Icon(Icons.more_vert),
-                                onSelected: (value) {
-                                  if (value == 'delete') {
-                                    _showDeleteTeamDialog(teams[index].name);
-                                  } else if (value == 'move') {
-                                    setState(() {
-                                      isMoveMode = true;
-                                    });
-                                  } else if (value == 'edit') {
-                                    _showEditTeamDialog(teams[index].name, teams[index]);
-                                  }
-                                },
-                                itemBuilder: (context) => [
-                                  const PopupMenuItem(
-                                    value: 'move',
-                                    child: ListTile(
-                                      leading: Icon(Icons.open_with),
-                                      title: Text('Move Team'),
-                                    ),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: 'edit',
-                                    child: ListTile(
-                                      leading: Icon(Icons.edit),
-                                      title: Text('Edit Team'),
-                                    ),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: 'delete',
-                                    child: ListTile(
-                                      leading: Icon(Icons.delete),
-                                      title: Text('Delete Team'),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              onTap: () {
-                                if (!isMoveMode) {
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/home/court',
-                                    arguments: teams[index],
-                                  );
-                                }
-                              },
-                            ),
+                          onTap: () {
+                            if (!isMoveMode) {
+                              Navigator.pushNamed(
+                                context,
+                                '/home/court',
+                                arguments: teams[index],
+                              );
+                            }
+                            setState(() {
+                              isMoveMode = false;
+                            });
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : ListView.builder(
+                  itemCount: teams.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        elevation: 5,
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.all(15),
+                          leading: Image.asset(
+                            teams[index].logo,
+                            width: 50,
+                            height: 50,
                           ),
-                        );
-                      },
-                    ),
-            ),
+                          title: Text(
+                            teams[index].name,
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
+                          trailing: PopupMenuButton(
+                            icon: const Icon(Icons.more_vert),
+                            onSelected: (value) {
+                              if (value == 'delete') {
+                                _showDeleteTeamDialog(teams[index].name);
+                              } else if (value == 'move') {
+                                setState(() {
+                                  isMoveMode = true;
+                                });
+                              } else if (value == 'edit') {
+                                _showEditTeamDialog(teams[index].name, teams[index]);
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                value: 'move',
+                                child: ListTile(
+                                  leading: Icon(Icons.open_with),
+                                  title: Text('Move Team'),
+                                ),
+                              ),
+                              const PopupMenuItem(
+                                value: 'edit',
+                                child: ListTile(
+                                  leading: Icon(Icons.edit),
+                                  title: Text('Edit Team'),
+                                ),
+                              ),
+                              const PopupMenuItem(
+                                value: 'delete',
+                                child: ListTile(
+                                  leading: Icon(Icons.delete),
+                                  title: Text('Delete Team'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          onTap: () {
+                            if (!isMoveMode) {
+                              Navigator.pushNamed(
+                                context,
+                                '/home/court',
+                                arguments: teams[index],
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddTeamDialog,
         tooltip: 'Add a team',

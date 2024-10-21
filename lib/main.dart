@@ -4,6 +4,7 @@ import 'loading.dart';
 import 'home.dart';
 import 'settings.dart';
 import 'court.dart';
+import 'info.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -13,6 +14,7 @@ void main() {
       '/home'         : (context) => Home(),
       '/home/court'   : (context) => Court(),
       '/home/settings': (context) => Settings(),
+      '/home/info'    : (context) => Info(),
     },
   ));
 }
