@@ -12,36 +12,40 @@ class _HomeState extends State<Home> {
   List<Team> teams = [];
   bool isMoveMode = false;
 
-
-  void _addTeam(String teamName, String teamLogo) { 
+  void _addTeam(String teamName, String teamLogo, Color mainColor, Color accentColor) { 
     setState(() {
-      teams.add(Team(name: teamName, logo: teamLogo));
+      teams.add(Team(
+        name: teamName,
+        logo: teamLogo,
+        mainColor: mainColor,
+        accentColor: accentColor,
+      ));
     });
-  
   }
 
   void _showAddTeamDialog() {
-    addTeamDialog(context, (teamName, teamLogo) {
-      _addTeam(teamName, teamLogo);
+    addTeamDialog(context, (teamName, teamLogo, mainColor, accentColor) {
+      _addTeam(teamName, teamLogo, mainColor, accentColor);
     }, teams);
   }
 
-  void _editTeam(String oldTeamName, String newTeamName, String newLogoPath) {
+  void _editTeam(String oldTeamName, String newTeamName, String newLogoPath, Color newMainColor, Color newAccentColor) {
     setState(() {
       for (var team in teams) {
         if (team.name == oldTeamName) {
           team.name = newTeamName;
           team.logo = newLogoPath;
+          team.mainColor = newMainColor;
+          team.accentColor = newAccentColor;
           break;
         }
       }
     });
-    
   }
 
-  void _showEditTeamDialog(String oldTeamName) {
-    editTeamDialog(context, oldTeamName, (newTeamName, newLogoPath) {
-      _editTeam(oldTeamName, newTeamName, newLogoPath);
+  void _showEditTeamDialog(String oldTeamName, Team team) {
+    editTeamDialog(context, team, (newTeamName, newLogoPath, newMainColor, newAccentColor) {
+      _editTeam(oldTeamName, newTeamName, newLogoPath, newMainColor, newAccentColor);
     }, teams);
   }
 
@@ -128,7 +132,7 @@ class _HomeState extends State<Home> {
                                       isMoveMode = true;
                                     });
                                   } else if (value == 'edit') {
-                                    _showEditTeamDialog(teams[index].name);
+                                    _showEditTeamDialog(teams[index].name, teams[index]);
                                   }
                                 },
                                 itemBuilder: (context) => [
@@ -163,6 +167,7 @@ class _HomeState extends State<Home> {
                                     arguments: teams[index],
                                   );
                                 }
+                                // This line can be removed if the user just wants to exit move mode on tap.
                                 setState(() {
                                   isMoveMode = false;
                                 });
@@ -203,7 +208,7 @@ class _HomeState extends State<Home> {
                                       isMoveMode = true;
                                     });
                                   } else if (value == 'edit') {
-                                    _showEditTeamDialog(teams[index].name);
+                                    _showEditTeamDialog(teams[index].name, teams[index]);
                                   }
                                 },
                                 itemBuilder: (context) => [
