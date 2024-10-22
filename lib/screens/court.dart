@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'team.dart';
-import 'player.dart';
+import '../team/team.dart';
+import '../player/player.dart';
+import '../player/addPlayerDialog.dart';
+import '../player/editPlayerDialog.dart';
+import '../player/deletePlayerDialog.dart';
 import 'dart:io';
 
 class Court extends StatefulWidget {

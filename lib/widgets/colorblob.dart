@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// Predefined basic colors
 List<Color> basicColors = [
   Colors.red,
   Colors.blue,
@@ -18,7 +17,6 @@ List<Color> basicColors = [
   Colors.black,
 ];
 
-// Function to display the color blobs
 Widget colorBlob(Color color, VoidCallback onPressed) {
   return GestureDetector(
     onTap: onPressed,

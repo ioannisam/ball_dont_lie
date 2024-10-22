@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'team.dart';
+import '../team/team.dart';
+import '../team/addTeamDialog.dart';
+import '../team/editTeamDialog.dart';
+import '../team/deleteTeamDialog.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
