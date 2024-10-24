@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 class Player {
   String name;
   String position;
+  String? icon;
+  int    jersey;
+  double height;
+
   double playingTime;
   int points;
   int assists;
@@ -15,6 +19,9 @@ class Player {
   Player({
     required this.name,
     required this.position,
+    required this.icon,
+    required this.jersey,
+    required this.height,
     this.playingTime = 0.0,
     this.points = 0,
     this.assists = 0,
@@ -25,9 +32,3 @@ class Player {
     this.threePointAttempts = 0,
   });
 }
-
-
-
-
-
-

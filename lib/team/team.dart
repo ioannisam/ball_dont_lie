@@ -6,10 +6,24 @@ class Team {
   String logo;
   List<Player> players;
 
+  String photo;
+  String coachName;
+  String assistantCoachName;
+
+
   Color mainColor;
   Color accentColor;
 
-  Team({required this.name, required this.logo, required this.mainColor, required this.accentColor}) : players = [];
+  Team({
+    required this.name, 
+    required this.logo, 
+    required this.mainColor, 
+    required this.accentColor,
+ 
+    this.coachName= 'N/A',
+    this.assistantCoachName= 'N/A',
+    this.photo = '/assets/placeholder.jpg',
+  }) : players = [];
 
   void addPlayer(Player player) {
     players.add(player);

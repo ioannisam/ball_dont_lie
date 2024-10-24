@@ -200,13 +200,6 @@ class _HomeState extends State<Home> {
                             ],
                           ),
                           onTap: () {
-                            if (!isMoveMode) {
-                              Navigator.pushNamed(
-                                context,
-                                '/home/court',
-                                arguments: teams[index],
-                              );
-                            }
                             setState(() {
                               isMoveMode = false;
                             });
@@ -275,13 +268,11 @@ class _HomeState extends State<Home> {
                             ],
                           ),
                           onTap: () {
-                            if (!isMoveMode) {
-                              Navigator.pushNamed(
-                                context,
-                                '/home/court',
-                                arguments: teams[index],
-                              );
-                            }
+                            Navigator.pushNamed(
+                              context,
+                              '/home/court',
+                              arguments: teams[index],
+                            );
                           },
                         ),
                       ),

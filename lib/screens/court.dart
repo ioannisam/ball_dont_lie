@@ -1,130 +1,99 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import '../team/team.dart';
 import '../player/player.dart';
 import '../player/addPlayerDialog.dart';
 import '../player/editPlayerDialog.dart';
 import '../player/deletePlayerDialog.dart';
-import 'dart:io';
+
 
 class Court extends StatefulWidget {
-  const Court({super.key});
-
   @override
   _CourtState createState() => _CourtState();
 }
 
 class _CourtState extends State<Court> {
+  late Team team;
+  late List<Player> players;
   bool isMoveMode = false;
-  String? teamImagePath;
 
-  String teamName = "";
-  int numberOfMembers = 0;
-  String coachName = "-";
-  String assistantCoachName = "-";
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-  void _addPlayer(String playerName, String playerPosition) {
-    final Team team = ModalRoute.of(context)!.settings.arguments as Team;
+    team = ModalRoute.of(context)!.settings.arguments as Team;
+    players = team.players;
+  }
 
-    if (team.players.any((player) => player.name.toLowerCase() == playerName.toLowerCase())) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('A player with this name already exists!'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
+  void _addPlayer(String playerName, String position, String? playerIcon, int jersey, double height) {
     setState(() {
-      team.addPlayer(Player(name: playerName, position: playerPosition));
-      numberOfMembers = team.players.length;
+      players.add(Player(
+        name: playerName,
+        icon: playerIcon,
+        jersey: jersey,
+        height: height,
+        position: position,
+      ));
     });
   }
 
   void _showAddPlayerDialog() {
-    addPlayerDialog(context, (newPlayer) {
-      _addPlayer(newPlayer.name, newPlayer.position);
+    addPlayerDialog(context, (playerName, position, playerIcon, jersey, height) {
+      _addPlayer(playerName, position, playerIcon, jersey, height);
+    }, players);
+  }
+
+  void _editPlayer(String oldPlayerName, String newPlayerName, String newPosition, String? newIconPath, int newJerseyNumber, double newHeight) {
+    setState(() {
+      for (var player in players) {
+        if (player.name == oldPlayerName) {
+          player.name = newPlayerName;
+          player.icon = newIconPath;
+          player.jersey = newJerseyNumber;
+          player.height = newHeight;
+          player.position = newPosition;
+          break;
+        }
+      }
     });
   }
 
-  void _showEditTeamInfoDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        String tempCoach = coachName;
-        String tempAssistantCoach = assistantCoachName;
-
-        return AlertDialog(
-          title: const Text('Edit Team Info'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: const InputDecoration(labelText: 'Coach Name'),
-                onChanged: (value) {
-                  tempCoach = value;
-                },
-                controller: TextEditingController(text: coachName),
-              ),
-              TextField(
-                decoration: const InputDecoration(labelText: 'Assistant Coach Name'),
-                onChanged: (value) {
-                  tempAssistantCoach = value;
-                },
-                controller: TextEditingController(text: assistantCoachName),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  coachName = tempCoach;
-                  assistantCoachName = tempAssistantCoach;
-                });
-                Navigator.of(context).pop();
-              },
-              child: const Text('Save'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-          ],
-        );
-      },
-    );
+  void _showEditPlayerDialog(String oldPlayerName, Player player) {
+    editPlayerDialog(context, player, (newPlayerName, newPosition, newIconPath, newJerseyNumber, newHeight) {
+      _editPlayer(oldPlayerName, newPlayerName, newPosition, newIconPath, newJerseyNumber, newHeight);
+    }, players);
   }
 
-  Future<void> _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        teamImagePath = image.path;
-      });
-    }
+  void _deletePlayer(String playerName) {
+    setState(() {
+      players.removeWhere((player) => player.name == playerName);
+    });
+  }
+
+  void _showDeletePlayerDialog(String playerName) {
+    deletePlayerDialog(context, () {
+      _deletePlayer(playerName);
+    });
+  }
+
+  void _reorderPlayer(int oldIndex, int newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) {
+        newIndex -= 1;
+      }
+      final Player player = players.removeAt(oldIndex);
+      players.insert(newIndex, player);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final Team team = ModalRoute.of(context)!.settings.arguments as Team;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('${team.name} Players'),
-        backgroundColor: Colors.orange,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
+        title: Text('${team.name} Court'),
+        centerTitle: true,
+        backgroundColor: team.mainColor,
         actions: [
-          if (isMoveMode) 
+          if (isMoveMode)
             IconButton(
               icon: const Icon(Icons.done),
               onPressed: () {
@@ -137,111 +106,199 @@ class _CourtState extends State<Court> {
       ),
       body: Column(
         children: [
-          Row(
-            children: [
-              Expanded(
-                flex: 1,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 2,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Team Information',
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: _showEditTeamInfoDialog,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      Text('Team Name: ${team.name}', style: const TextStyle(fontSize: 18)),
-                      Text('Number of Members: $numberOfMembers', style: const TextStyle(fontSize: 18)),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          const Icon(Icons.person, size: 20),
-                          const SizedBox(width: 10),
-                          Text('Coach: $coachName', style: const TextStyle(fontSize: 18)),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          const Icon(Icons.person, size: 20),
-                          const SizedBox(width: 10),
-                          Text('Assistant Coach: $assistantCoachName', style: const TextStyle(fontSize: 18)),
-                        ],
-                      ),
+                      Text('Team: ${team.name}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      Text('Members: ${players.length}', style: TextStyle(fontSize: 16)),
+                      Text('Coach: ${team.coachName}', style: TextStyle(fontSize: 16)),
+                      Text('Assistant: ${team.assistantCoachName}', style: TextStyle(fontSize: 16)),
+                      IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed: () {
+                          // Logic for editing team info
+                        },
+                      )
                     ],
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 1,
-                child: GestureDetector(
-                  onTap: _pickImage,
-                  child: Container(
-                    width: double.infinity,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.blueAccent),
-                      borderRadius: BorderRadius.circular(15.0),
-                      image: teamImagePath != null
-                          ? DecorationImage(
-                              image: FileImage(File(teamImagePath!)),
-                              fit: BoxFit.cover,
-                            )
-                          : const DecorationImage(
-                              image: AssetImage('assets/placeholder.jpg'),
-                              fit: BoxFit.cover,
-                            ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        teamImagePath == null ? 'Tap to add team photo' : '',
-                        style: const TextStyle(color: Colors.white, fontSize: 18),
+                Expanded(
+                  flex: 1,
+                  child: GestureDetector(
+                    onTap: () {
+                      // Zoom logic for team photo
+                    },
+                    child: Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        border: Border.all(),
+                        borderRadius: BorderRadius.circular(10),
                       ),
+                      child: const Icon(Icons.photo, size: 50),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: ListView.builder(
-              itemCount: team.players.length,
-              itemBuilder: (context, index) {
-                final player = team.players[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: AssetImage('assets/placeholder.jpg'),
-                    ),
-                    title: Text('${player.name} (${player.position})'),
-                    onTap: () {
-                      if(!isMoveMode) {
-                        //go to the payers stat page
-                      }
-                    },
-                  ),
-                );
-              },
+              ],
             ),
+          ),
+          Expanded(
+            child: players.isEmpty
+                ? const Center(child: Text('No players added yet!'))
+                : isMoveMode
+                    ? ReorderableListView.builder(
+                        itemCount: players.length,
+                        onReorder: _reorderPlayer,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            key: ValueKey(players[index]),
+                            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              elevation: 5,
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.all(15),
+                                leading: Image.asset(
+                                  players[index].icon ?? '/assets/logo.png',
+                                  width: 50,
+                                  height: 50,
+                                ),
+                                title: Text(
+                                  players[index].name,
+                                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                                ),
+                                subtitle: Text('Jersey: ${players[index].jersey} | Position: ${players[index].position}'),
+                                trailing: PopupMenuButton(
+                                  icon: const Icon(Icons.more_vert),
+                                  onSelected: (value) {
+                                    if (value == 'delete') {
+                                      _showDeletePlayerDialog(players[index].name);
+                                    } else if (value == 'move') {
+                                      setState(() {
+                                        isMoveMode = true;
+                                      });
+                                    } else if (value == 'edit') {
+                                      _showEditPlayerDialog(players[index].name, players[index]);
+                                    }
+                                  },
+                                  itemBuilder: (context) => [
+                                    const PopupMenuItem(
+                                      value: 'move',
+                                      child: ListTile(
+                                        leading: Icon(Icons.open_with),
+                                        title: Text('Move Player'),
+                                      ),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: 'edit',
+                                      child: ListTile(
+                                        leading: Icon(Icons.edit),
+                                        title: Text('Edit Player'),
+                                      ),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: 'delete',
+                                      child: ListTile(
+                                        leading: Icon(Icons.delete),
+                                        title: Text('Delete Player'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    isMoveMode = false;
+                                  });
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : ListView.builder(
+                        itemCount: players.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              elevation: 5,
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.all(15),
+                                leading: Image.asset(
+                                  players[index].icon ?? '/assets/logo.png',
+                                  width: 50,
+                                  height: 50,
+                                ),
+                                title: Text(
+                                  players[index].name,
+                                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                                ),
+                                subtitle: Text('Jersey: ${players[index].jersey} | Position: ${players[index].position}'),
+                                trailing: PopupMenuButton(
+                                  icon: const Icon(Icons.more_vert),
+                                  onSelected: (value) {
+                                    if (value == 'delete') {
+                                      _showDeletePlayerDialog(players[index].name);
+                                    } else if (value == 'move') {
+                                      setState(() {
+                                        isMoveMode = true;
+                                      });
+                                    } else if (value == 'edit') {
+                                      _showEditPlayerDialog(players[index].name, players[index]);
+                                    }
+                                  },
+                                  itemBuilder: (context) => [
+                                    const PopupMenuItem(
+                                      value: 'move',
+                                      child: ListTile(
+                                        leading: Icon(Icons.open_with),
+                                        title: Text('Move Player'),
+                                      ),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: 'edit',
+                                      child: ListTile(
+                                        leading: Icon(Icons.edit),
+                                        title: Text('Edit Player'),
+                                      ),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: 'delete',
+                                      child: ListTile(
+                                        leading: Icon(Icons.delete),
+                                        title: Text('Delete Player'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                onTap: () {
+                                  // Navigate to player Screen          
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddPlayerDialog,
-        tooltip: 'Add Player',
+        tooltip: 'Add a player',
         child: const Icon(Icons.add),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

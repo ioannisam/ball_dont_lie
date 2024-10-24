@@ -22,7 +22,7 @@ Future<void> addTeamDialog(
     List<Team> existingTeams) async {
   
   String teamName = getNextTeamName(existingTeams);
-  String? selectedLogoPath = 'assets/logo.png';
+  String? teamLogo = 'assets/logo.png';
   final picker = ImagePicker();
   Color mainColor = Colors.orange;
   Color accentColor = Colors.white;
@@ -37,7 +37,7 @@ Future<void> addTeamDialog(
       final XFile? image = await picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
         setState(() {
-          selectedLogoPath = image.path;
+          teamLogo = image.path;
         });
       }
     } catch (e) {
@@ -97,7 +97,7 @@ Future<void> addTeamDialog(
                 const SizedBox(height: 20),
                 const Text("Add a logo"),
                 DropdownButton<String>(
-                  value: predefinedLogos.contains(selectedLogoPath) ? selectedLogoPath : null,
+                  value: predefinedLogos.contains(teamLogo) ? teamLogo : null,
                   hint: const Text("Select a logo"),
                   items: predefinedLogos.map((String logo) {
                     return DropdownMenuItem<String>(
@@ -116,13 +116,13 @@ Future<void> addTeamDialog(
                       _pickLogo(setState);
                     } else {
                       setState(() {
-                        selectedLogoPath = newValue;
+                        teamLogo = newValue;
                       });
                     }
                   },
                 ),
                 const SizedBox(height: 20),
-                selectedLogoPath != null
+                teamLogo != null
                     ? Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
@@ -136,14 +136,14 @@ Future<void> addTeamDialog(
                             ),
                           ],
                         ),
-                        child: selectedLogoPath!.startsWith('assets')
+                        child: teamLogo!.startsWith('assets')
                             ? Image.asset(
-                                selectedLogoPath!,
+                                teamLogo!,
                                 width: 100,
                                 height: 100,
                               )
                             : Image.file(
-                                File(selectedLogoPath!),
+                                File(teamLogo!),
                                 width: 100,
                                 height: 100,
                               ),
@@ -205,7 +205,7 @@ Future<void> addTeamDialog(
                   } else if (teamExists) {
                     showSnackbar(context, "A team with this name already exists!", Colors.red);
                   } else {
-                    onAdded(teamName, selectedLogoPath ?? 'assets/logo.png', mainColor, accentColor);
+                    onAdded(teamName, teamLogo ?? 'assets/logo.png', mainColor, accentColor);
                     showSnackbar(context, "Team added successfully!", Colors.deepPurple);
                     Navigator.of(context).pop();
                   }

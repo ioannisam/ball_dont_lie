@@ -16,6 +16,9 @@ Future<void> deleteTeamDialog(BuildContext context, Function() onDeleted) async 
             child: const Text('Cancel'),
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
             onPressed: () {
               onDeleted();
               showSnackbar(context, "Team deleted successfully!", Colors.black87);
