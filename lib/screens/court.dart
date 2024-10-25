@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../team/team.dart';
 import '../player/player.dart';
 import '../player/addPlayerDialog.dart';
@@ -85,6 +87,193 @@ class _CourtState extends State<Court> {
     });
   }
 
+  void _showZoomedImage(String imagePath) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: InteractiveViewer(
+              boundaryMargin: EdgeInsets.all(20.0),
+              minScale: 0.5,
+              maxScale: 4.0,
+              child: Image.asset(imagePath),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showEditInfoDialog(BuildContext context) {
+    TextEditingController coachNameController = TextEditingController(text: team.coachName);
+    TextEditingController assistantCoachNameController = TextEditingController(text: team.assistantCoachName);
+    TextEditingController descriptionController = TextEditingController(text: team.description);
+
+    String coachPhotoPath = team.coachPhoto;
+    String assistantCoachPhotoPath = team.assistantCoachPhoto;
+    String teamPhotoPath = team.photo;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Edit Team Info', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+          content: SingleChildScrollView(
+            child: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Team Description
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: TextField(
+                        controller: descriptionController,
+                        decoration: InputDecoration(
+                          labelText: 'Team Description',
+                          labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+
+                    // Coach Info
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () async {
+                              final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                              if (pickedFile != null) {
+                                setState(() {
+                                  coachPhotoPath = pickedFile.path;
+                                });
+                              }
+                            },
+                            child: CircleAvatar(
+                              backgroundImage: FileImage(File(coachPhotoPath)),
+                              radius: 28,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: TextField(
+                              controller: coachNameController,
+                              decoration: InputDecoration(
+                                labelText: 'Coach Name',
+                                labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Assistant Coach Info
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () async {
+                              final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                              if (pickedFile != null) {
+                                setState(() {
+                                  assistantCoachPhotoPath = pickedFile.path;
+                                });
+                              }
+                            },
+                            child: CircleAvatar(
+                              backgroundImage: FileImage(File(assistantCoachPhotoPath)),
+                              radius: 28,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: TextField(
+                              controller: assistantCoachNameController,
+                              decoration: InputDecoration(
+                                labelText: 'Assistant Coach Name',
+                                labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Team Photo
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () async {
+                              final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                              if (pickedFile != null) {
+                                setState(() {
+                                  teamPhotoPath = pickedFile.path;
+                                });
+                              }
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image(
+                                image: FileImage(File(teamPhotoPath)),
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Team Photo',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  team.coachName = coachNameController.text;
+                  team.assistantCoachName = assistantCoachNameController.text;
+                  team.description = descriptionController.text;
+                  team.coachPhoto = coachPhotoPath;
+                  team.assistantCoachPhoto = assistantCoachPhotoPath;
+                  team.photo = teamPhotoPath;
+                });
+                Navigator.of(context).pop();
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,37 +300,84 @@ class _CourtState extends State<Court> {
             child: Row(
               children: [
                 Expanded(
-                  flex: 2,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Team: ${team.name}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      Text('Members: ${players.length}', style: TextStyle(fontSize: 16)),
-                      Text('Coach: ${team.coachName}', style: TextStyle(fontSize: 16)),
-                      Text('Assistant: ${team.assistantCoachName}', style: TextStyle(fontSize: 16)),
-                      IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () {
-                          // Logic for editing team info
-                        },
-                      )
-                    ],
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.deepPurple),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Stack(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Team: ${team.name}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                              Text('Members: ${players.length}', style: TextStyle(fontSize: 16)),
+                              Row(
+                                children: [
+                                  CircleAvatar(
+                                    backgroundColor: Colors.grey[300],
+                                    child: Image.asset(team.coachPhoto)
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text('Coach: ${team.coachName}', style: TextStyle(fontSize: 16)),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  CircleAvatar(
+                                    backgroundColor: Colors.grey[300],
+                                    child: Image.asset(team.assistantCoachPhoto)
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text('Assistant: ${team.assistantCoachName}', style: TextStyle(fontSize: 16)),
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  team.description,
+                                  style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () {
+                              _showEditInfoDialog(context);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
+                const SizedBox(width: 10),
                 Expanded(
-                  flex: 1,
                   child: GestureDetector(
                     onTap: () {
-                      // Zoom logic for team photo
+                      _showZoomedImage(team.photo);
                     },
                     child: Container(
-                      width: 100,
-                      height: 100,
+                      height: 150,
                       decoration: BoxDecoration(
-                        border: Border.all(),
+                        border: Border.all(color: Colors.deepPurple),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.photo, size: 50),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.asset(
+                          team.photo,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -167,7 +403,7 @@ class _CourtState extends State<Court> {
                               child: ListTile(
                                 contentPadding: const EdgeInsets.all(15),
                                 leading: Image.asset(
-                                  players[index].icon ?? '/assets/logo.png',
+                                  players[index].icon ?? 'assets/logo.png',
                                   width: 50,
                                   height: 50,
                                 ),

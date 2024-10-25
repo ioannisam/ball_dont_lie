@@ -1,0 +1,1 @@
+fix update image on the players tab

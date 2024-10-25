@@ -7,9 +7,11 @@ class Team {
   List<Player> players;
 
   String photo;
+  String description;
   String coachName;
+  String coachPhoto;
   String assistantCoachName;
-
+  String assistantCoachPhoto;
 
   Color mainColor;
   Color accentColor;
@@ -19,10 +21,13 @@ class Team {
     required this.logo, 
     required this.mainColor, 
     required this.accentColor,
- 
+  
+    this.description = 'Basketball team',
     this.coachName= 'N/A',
+    this.coachPhoto = 'assets/ball.png',
     this.assistantCoachName= 'N/A',
-    this.photo = '/assets/placeholder.jpg',
+    this.assistantCoachPhoto = 'assets/ball2.png',
+    this.photo = 'assets/placeholder.jpg',
   }) : players = [];
 
   void addPlayer(Player player) {
